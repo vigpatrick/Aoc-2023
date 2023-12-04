@@ -22,7 +22,7 @@ File.readlines('Day-2-2').each do |line|
     end
   end
 
-  result += max_bag[:red] * max_bag[:green] * max_bag[:blue]
+  result += max_bag.reduce(1) { |product, num| num[1] * product }
 end
 
 p result
