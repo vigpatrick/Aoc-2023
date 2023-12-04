@@ -12,7 +12,7 @@
 [![Day](https://badgen.net/badge/01/%E2%98%85%E2%98%85/green)](day_1)
 [![Day](https://badgen.net/badge/02/%E2%98%85%E2%98%85/green)](day_2)
 [![Day](https://badgen.net/badge/03/%E2%98%85%E2%98%85/green)](day_3)
-![Day](https://badgen.net/badge/4/%E2%98%86%E2%98%86/gray)
+[![Day](https://badgen.net/badge/04/%E2%98%85%E2%98%85/green)](day_4)
 ![Day](https://badgen.net/badge/5/%E2%98%86%E2%98%86/gray)
 ![Day](https://badgen.net/badge/6/%E2%98%86%E2%98%86/gray)
 ![Day](https://badgen.net/badge/7/%E2%98%86%E2%98%86/gray)
