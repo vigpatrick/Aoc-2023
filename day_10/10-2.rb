@@ -25,14 +25,12 @@ def possible_dir(map, direction, current_pipe_pos)
     return false if direction[1] == -1 && ["7", "F", "-"].include?(next_pipe)
     return false if direction[0] == 1 && ["L", "F", "|"].include?(next_pipe)
     return false if direction[0] == -1 && ["7", "J", "|"].include?(next_pipe)
-    return true
-  else
-    return possible_junction[current_pipe.to_sym].include?(next_pipe)
   end
+
+  return true
 end
 
 def follow_path(start, map, dir)
-
   visited = []
   possible_dir = {
     "-": [Vector[-1, 0], Vector[1, 0]],
@@ -46,59 +44,47 @@ def follow_path(start, map, dir)
   current_pipe = map[start[1] + dir[1]][start[0] + dir[0]]
   pos = [start[0] + dir[0], start[1] + dir[1]]
   count = 1
-  visited << "#{pos[0]},#{pos[1]}"
+  visited << pos.dup
 
   while current_pipe != "S"
-    dir = possible_dir[current_pipe.to_sym].filter {|new_dir| new_dir + dir != Vector[0,0]}[0]
-    current_pipe =  map[pos[1] + dir[1]][pos[0]+ dir[0]]
+    dir = possible_dir[current_pipe.to_sym].filter { |new_dir| new_dir + dir != Vector[0, 0] }[0]
+    current_pipe = map[pos[1] + dir[1]][pos[0] + dir[0]]
     pos = [pos[0] + dir[0], pos[1] + dir[1]]
-    visited << "#{pos[0]},#{pos[1]}"
+    visited << pos.dup
 
-    return if current_pipe == '.'
+    return visited if current_pipe == '.'
     count += 1
   end
 
-
-  p count % 2 == 0 ? count / 2 : (count - 1)  / 2
-
+  p count.even? ? count / 2 : (count - 1) / 2
   visited
 end
 
 map = []
-i = 0
 start = []
-visited = []
 
-File.readlines(File.join(__dir__, '10-2')).each do |line|
-  map << line.delete("\n").split("")
-
+File.readlines(File.join(__dir__, '10-2')).each.with_index do |line, i|
+  map << line.chomp.split("")
   start = Vector[line.index("S"), i] if line.include?("S")
-  i += 1
 end
 
+possible_dir = [Vector[1, 0], Vector[-1, 0], Vector[0, 1], Vector[0, -1]]
 
-possible_dir = [Vector[1,0], Vector[-1, 0], Vector[0, 1], Vector[0,-1]]
+starts = possible_dir.select { |dir| possible_dir(map, dir, start) }
+visited = starts.map { |dir| follow_path(start, map, dir) }.flatten(1)
 
-starts = []
-possible_dir.each do | dir |
-  next unless possible_dir(map, dir, start)
-  starts << dir
-  visited << follow_path(start, map, dir)
-end
-
-
-(0..map.length-1).each do |j|
-  (0..map[0].length-1).each do |i|
-      map[j][i] = "." unless visited[0].include?("#{i},#{j}")
-      map[j][i] = "J" if map[j][i] == "S"
+map.each_index do |j|
+  map[0].each_index do |i|
+    map[j][i] = "." unless visited.include?([i, j])
+    map[j][i] = "J" if map[j][i] == "S"
   end
 end
 
 count = 0
 
-(0..map.length-1).each do |j|
+map.each_index do |j|
   outside = true
-  (0..map[0].length-1).each do |i|
+  map[0].each_index do |i|
     if ["|", "J", "L"].include?(map[j][i])
       outside = !outside
     end

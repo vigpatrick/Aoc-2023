@@ -25,14 +25,13 @@ def possible_dir(map, direction, current_pipe_pos)
     return false if direction[1] == -1 && ["7", "F", "-"].include?(next_pipe)
     return false if direction[0] == 1 && ["L", "F", "|"].include?(next_pipe)
     return false if direction[0] == -1 && ["7", "J", "|"].include?(next_pipe)
-    return true
-  else
-    return possible_junction[current_pipe.to_sym].include?(next_pipe)
   end
+
+  return true
 end
 
-def follow_path(start, map, dir)
 
+def follow_path(start, map, dir)
   possible_dir = {
     "-": [Vector[-1, 0], Vector[1, 0]],
     "7": [Vector[-1, 0], Vector[0, 1]],
@@ -43,39 +42,24 @@ def follow_path(start, map, dir)
   }
 
   current_pipe = map[start[1] + dir[1]][start[0] + dir[0]]
-  pos = [start[0] + dir[0], start[1] + dir[1]]
+  pos = start + dir
   count = 1
 
   while current_pipe != "S"
-    dir = possible_dir[current_pipe.to_sym].filter {|new_dir| new_dir + dir != Vector[0,0]}[0]
-    current_pipe =  map[pos[1] + dir[1]][pos[0]+ dir[0]]
-    pos = [pos[0] + dir[0], pos[1] + dir[1]]
+    dir = possible_dir[current_pipe.to_sym].filter { |new_dir| new_dir + dir != Vector[0, 0] }[0]
+    current_pipe = map[pos[1] + dir[1]][pos[0] + dir[0]]
+    pos += dir
 
     break if current_pipe == '.'
     count += 1
   end
 
-  p count % 2 == 0 ? count / 2 : (count - 1)  / 2
+  p count.even? ? count / 2 : (count - 1) / 2
 end
 
-map = []
-i = 0
-start = []
+map = File.readlines(File.join(__dir__, '10-1')).map { |line| line.chomp.split('') }
+start = map.each_with_index.flat_map { |line, i| line.include?('S') ? Vector[line.index('S'), i] : [] }.first
 
-File.readlines(File.join(__dir__, '10-1')).each do |line|
-  map << line.delete("\n").split("")
-
-  start = Vector[line.index("S"), i] if line.include?("S")
-  i += 1
-end
-
-
-possible_dir = [Vector[1,0], Vector[-1, 0], Vector[0, 1], Vector[0,-1]]
-
-starts = []
-possible_dir.each do | dir |
-  next unless possible_dir(map, dir, start)
-  starts << dir
-  follow_path(start, map, dir)
-end
-
+possible_dir = [Vector[1, 0], Vector[-1, 0], Vector[0, 1], Vector[0, -1]]
+starts = possible_dir.filter { |dir| possible_dir(map, dir, start) }
+starts.each { |dir| follow_path(start, map, dir) }
